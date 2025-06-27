@@ -24,7 +24,7 @@
 ```yaml
 services:
     sgcc:
-        image: IMAGE_TAG
+        image: ghcr.io/hmqgg/sgccelectricitynet:latest
         volumes:
             - ./appsettings.toml:/app/appsettings.toml
         init: true
@@ -43,7 +43,7 @@ docker run -d --init \
  --name=sgcc \
  -v $PWD/appsettings.toml:/app/appsettings.toml \
  --restart=unless-stopped \
- IMAGE_TAG
+ ghcr.io/hmqgg/sgccelectricitynet:latest
 ```
 
 ### Native
