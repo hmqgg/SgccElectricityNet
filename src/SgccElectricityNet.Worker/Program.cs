@@ -7,6 +7,12 @@ using Tomlyn.Extensions.Configuration;
 
 var builder = Host.CreateApplicationBuilder(args);
 
+builder.Configuration.Sources.Clear();
+builder.Configuration
+    .AddTomlFile("appsettings.toml", true, true)
+    .AddTomlFile($"appsettings.{builder.Environment.EnvironmentName}.toml", true, true)
+    .AddEnvironmentVariables("SGCC_");
+
 builder.Services
     .AddCaptchaService(builder.Configuration.GetSection("Captcha"))
     .AddFetcherService(builder.Configuration.GetSection("Fetcher"))
@@ -15,15 +21,9 @@ builder.Services
 builder.Services.AddScheduler();
 builder.Services.AddScoped<UpdateInvocable>();
 
-builder.Configuration.Sources.Clear();
-builder.Configuration
-    .AddTomlFile("appsettings.toml", true, true)
-    .AddTomlFile($"appsettings.{builder.Environment.EnvironmentName}.toml", true, true)
-    .AddEnvironmentVariables("SGCC_");
-
 var host = builder.Build();
 
-var cron = host.Services.GetService<IConfiguration>()?.GetValue<string>("Schedule");
+var cron = host.Services.GetRequiredService<IConfiguration>().GetValue<string>("Schedule");
 if (string.IsNullOrEmpty(cron))
 {
     // Defaults to 9:00 every day.
