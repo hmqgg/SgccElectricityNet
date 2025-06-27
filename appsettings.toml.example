@@ -1,0 +1,21 @@
+Schedule = "0 9 * * *"
+
+[Logging.LogLevel]
+Default = "Information"
+
+[Fetcher]
+Type = "Playwright"
+Username = "your_username"
+Password = "your_password (optional: if use SMS)"
+MaxAttempts = 5
+
+[Captcha]
+Type = "Recognizer"
+ModelPath = "assets/recognizer_single_cls.onnx"
+
+[[Publishers]]
+Type = "Mqtt"
+Host = "localhost"
+Port = 1883
+Username = "mqtt_user (ignore this line if n/a)"
+Password = "mqtt_password (ignore this line if n/a)"

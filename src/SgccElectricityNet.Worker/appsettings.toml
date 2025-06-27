@@ -1,0 +1,22 @@
+Schedule = "0 9 * * *"
+
+[Logging.LogLevel]
+Default = "Information"
+"Microsoft.Hosting.Lifetime" = "Information"
+
+[Fetcher]
+Type = "Playwright"
+Username = "your_username"
+Password = "your_password (optional: if use SMS)"
+MaxAttempts = 5
+
+[Captcha]
+Type = "Onnx"
+ModelPath = "assets/captcha.onnx"
+
+[[Publishers]]
+Type = "Mqtt"
+Host = "localhost"
+Port = 1883
+Username = "mqtt_user"
+Password = "mqtt_password"

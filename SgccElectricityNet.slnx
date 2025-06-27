@@ -1,0 +1,14 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="compose.yaml" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src\SgccElectricityNet.Worker\SgccElectricityNet.Worker.csproj" Type="Classic C#" />
+  </Folder>
+  <Folder Name="/test/">
+    <Project Path="test\SgccElectricityNet.Benchmarks.Captcha\SgccElectricityNet.Benchmarks.Captcha.csproj" Type="Classic C#" />
+    <Project Path="test\SgccElectricityNet.Tests.Captcha\SgccElectricityNet.Tests.Captcha.csproj" Type="Classic C#" />
+    <Project Path="test\SgccElectricityNet.Tests.Fetcher\SgccElectricityNet.Tests.Fetcher.csproj" Type="Classic C#" />
+    <Project Path="test\SgccElectricityNet.Tests.Publishing\SgccElectricityNet.Tests.Publishing.csproj" Type="Classic C#" />
+  </Folder>
+</Solution>
