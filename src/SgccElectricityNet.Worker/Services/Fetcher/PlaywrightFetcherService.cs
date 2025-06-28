@@ -478,7 +478,7 @@ public sealed class PlaywrightBrowserFactory : IAsyncDisposable
                 return await _playwright.Chromium.ConnectAsync(wsUrl);
             }
 
-            var exitCode = Microsoft.Playwright.Program.Main(["install"]);
+            var exitCode = Microsoft.Playwright.Program.Main(["install", "chromium"]);
             if (exitCode != 0)
             {
                 throw new InvalidOperationException($"Playwright installation failed with exit code {exitCode}");
