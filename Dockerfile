@@ -18,4 +18,14 @@ RUN dotnet publish "./SgccElectricityNet.Worker.csproj" -c $BUILD_CONFIGURATION 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+COPY --from=build /usr/share/powershell /usr/share/powershell
+ENV PLAYWRIGHT_BROWSERS_PATH=/app/.playwright
+USER root
+RUN \
+    ln -s /usr/share/powershell/pwsh /usr/bin/pwsh && \
+    pwsh /app/playwright.ps1 install --with-deps chromium && \
+    rm -rf /usr/share/powershell /usr/bin/pwsh && \
+    chmod -R +x /app/.playwright && \
+    chown -R $APP_UID:$APP_UID /app/.playwright
+USER $APP_UID
 ENTRYPOINT ["dotnet", "SgccElectricityNet.Worker.dll"]
