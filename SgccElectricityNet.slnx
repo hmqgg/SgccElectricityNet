@@ -1,4 +1,8 @@
 <Solution>
+  <Folder Name="/solution/">
+    <File Path="appsettings.toml.example" />
+    <File Path="Dockerfile" />
+  </Folder>
   <Folder Name="/src/">
     <Project Path="src\SgccElectricityNet.Worker\SgccElectricityNet.Worker.csproj" />
   </Folder>

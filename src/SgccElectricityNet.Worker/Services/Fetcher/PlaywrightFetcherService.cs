@@ -466,10 +466,18 @@ public sealed class PlaywrightBrowserFactory : IAsyncDisposable
     private readonly AsyncLazy<IBrowser> _browserLazy;
     private IPlaywright? _playwright;
 
-    public PlaywrightBrowserFactory(IHostEnvironment hostEnvironment)
+    public PlaywrightBrowserFactory(IOptions<PlaywrightBrowserFactoryOptions> options, IHostEnvironment hostEnvironment)
     {
         _browserLazy = new AsyncLazy<IBrowser>(async () =>
         {
+            if (options.Value.IsRemote)
+            {
+                var wsUrl = options.Value.WebSocket ?? throw new ArgumentNullException(nameof(options.Value.WebSocket), "WebSocket URL is required for remote Playwright connection.");
+                // Connect to an existing browser instance using WebSocket URL.
+                _playwright = await Playwright.CreateAsync();
+                return await _playwright.Chromium.ConnectAsync(wsUrl);
+            }
+
             var exitCode = Microsoft.Playwright.Program.Main(["install"]);
             if (exitCode != 0)
             {
@@ -502,3 +510,5 @@ public sealed class PlaywrightBrowserFactory : IAsyncDisposable
         _playwright?.Dispose();
     }
 }
+
+public record PlaywrightBrowserFactoryOptions(bool IsRemote = false, string? WebSocket = null);
