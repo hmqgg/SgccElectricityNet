@@ -20,6 +20,7 @@
     <PackageReference Include="HomeAssistantDiscoveryNet" Version="5.1.0" />
     <PackageReference Include="MQTTnet" Version="5.0.1.1416" />
     <PackageReference Include="Tomlyn.Extensions.Configuration" Version="1.0.6" />
+    <PackageReference Include="ZLogger" Version="2.5.10" />
   </ItemGroup>
 
   <ItemGroup>

@@ -4,8 +4,23 @@ using SgccElectricityNet.Worker.Services.Captcha;
 using SgccElectricityNet.Worker.Services.Fetcher;
 using SgccElectricityNet.Worker.Services.Publishing;
 using Tomlyn.Extensions.Configuration;
+using ZLogger;
 
 var builder = Host.CreateApplicationBuilder(args);
+
+builder.Logging.ClearProviders();
+builder.Logging.AddZLoggerConsole(o =>
+{
+    o.UsePlainTextFormatter(f =>
+    {
+        f.SetPrefixFormatter(
+            $"{0:utc-longdate} [{1:short}] ({2}) ",
+            (in MessageTemplate template, in LogInfo info) => template.Format(
+                info.Timestamp,
+                info.LogLevel,
+                info.Category));
+    });
+});
 
 builder.Configuration.Sources.Clear();
 builder.Configuration
