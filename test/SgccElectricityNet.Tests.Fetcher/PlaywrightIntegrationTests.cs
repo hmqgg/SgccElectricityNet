@@ -16,11 +16,12 @@ public sealed class PlaywrightIntegrationTests(ITestOutputHelper output) : IAsyn
 
     public Task InitializeAsync()
     {
+        var options = Options.Create(new PlaywrightBrowserFactoryOptions());
         var env = new HostingEnvironment
         {
             EnvironmentName = Environments.Development,
         };
-        _playwrightBrowserFactory = new PlaywrightBrowserFactory(env);
+        _playwrightBrowserFactory = new PlaywrightBrowserFactory(options, env);
         _client = new HttpClient();
         _fetcherService = MakeFetcherService();
         output.WriteLine("✓ Test setup completed");
