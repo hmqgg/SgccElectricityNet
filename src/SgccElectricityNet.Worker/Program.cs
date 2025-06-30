@@ -38,7 +38,8 @@ builder.Services.AddScoped<UpdateInvocable>();
 
 var host = builder.Build();
 
-var cron = host.Services.GetRequiredService<IConfiguration>().GetValue<string>("Schedule");
+var cron = host.Services.GetRequiredService<IConfiguration>().GetValue<string?>("Schedule");
+var runOnceAtStart = host.Services.GetRequiredService<IConfiguration>().GetValue<bool?>("RunOnce") ?? true;
 if (string.IsNullOrEmpty(cron))
 {
     // Defaults to 9:00 every day.
@@ -46,16 +47,20 @@ if (string.IsNullOrEmpty(cron))
 }
 host.Services.UseScheduler(scheduler =>
 {
-    scheduler
+    var schedule = scheduler
         .Schedule<UpdateInvocable>()
-        .Cron(cron)
+        .Cron(cron);
+    schedule = schedule
         .Zoned(
             TimeZoneInfo.CreateCustomTimeZone(
                 nameof(SgccElectricityNet),
                 TimeSpan.FromHours(+8),
                 nameof(SgccElectricityNet),
-                nameof(SgccElectricityNet)))
-        .RunOnceAtStart();
+                nameof(SgccElectricityNet)));
+    if (runOnceAtStart)
+    {
+        schedule.RunOnceAtStart();
+    }
 });
 
 host.Run();
