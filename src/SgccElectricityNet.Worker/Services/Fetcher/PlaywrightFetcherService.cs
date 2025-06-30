@@ -14,7 +14,7 @@ public sealed class PlaywrightFetcherService(
     : IFetcherService
 {
     private const string LoginUrl = "https://www.95598.cn/osgweb/login";
-    private const string RedirectUrl = "https://www.95598.cn/osgweb/my95598";
+    private const string AuthorizeUrl = "https://www.95598.cn/api/oauth2/outer/getWebToken";
     // Yes, it's 'Maneger'.
     private const string DoorNumberUrl = "https://www.95598.cn/osgweb/doorNumberManeger";
     private const string BalanceUrl = "https://www.95598.cn/osgweb/userAcc";
@@ -129,6 +129,7 @@ public sealed class PlaywrightFetcherService(
                 break;
         }
 
+        await Task.Delay(TimeSpan.FromSeconds(3), cancellationToken);
         return loggedIn;
     }
 
@@ -150,9 +151,16 @@ public sealed class PlaywrightFetcherService(
 
         cancellationToken.ThrowIfCancellationRequested();
         await page.GetByPlaceholder("请输入验证码").FillAsync(code);
-        await page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "登录" }).ClickAsync();
+        var loggedIn = await RunAndWaitForLoggedInAsync(
+            page,
+            async () => await page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "登录" }).ClickAsync());
 
-        await WaitForPageRedirectAsync(page);
+        if (!loggedIn)
+        {
+            logger.LogWarning("Failed to login with sms code, still on login page.");
+            return false;
+        }
+
         logger.LogInformation("Successfully logged in with sms code: {code}", code);
         return true;
     }
@@ -207,14 +215,13 @@ public sealed class PlaywrightFetcherService(
         await page.Mouse.MoveAsync(slider.X + slider.Width / 2, slider.Y + slider.Height / 2);
         await page.Mouse.DownAsync();
         await page.Mouse.MoveAsync(slider.X + slider.Width / 2 + distance, slider.Y + slider.Height / 2, new MouseMoveOptions { Steps = 5 });
-        await page.Mouse.UpAsync();
-
-        cancellationToken.ThrowIfCancellationRequested();
-        if (!await WaitForPageRedirectAsync(page))
+        var loggedIn = await RunAndWaitForLoggedInAsync(page, async () => await page.Mouse.UpAsync());
+        if (!loggedIn)
         {
             var rk = await page.GetByText("RK001", new PageGetByTextOptions { Exact = false }).CountAsync();
             if (rk > 0)
             {
+                // Skip when RK001 occured.
                 logger.LogError("Found RK001 error which indicates unrecoverable network issues.");
                 throw new InvalidOperationException("Network error occurred, unable to connect to the website.");
             }
@@ -227,16 +234,18 @@ public sealed class PlaywrightFetcherService(
         return true;
     }
 
-    private async Task<bool> WaitForPageRedirectAsync(IPage page)
+    private async Task<bool> RunAndWaitForLoggedInAsync(IPage page, Func<Task> run)
     {
         try
         {
-            await page.WaitForURLAsync(RedirectUrl);
-            return true;
+            var response = await page.RunAndWaitForResponseAsync(
+                run,
+                r => r.Url.StartsWith(AuthorizeUrl) && r.Ok);
+            return response.Ok;
         }
         catch (TimeoutException ex)
         {
-            logger.LogError(ex, "Failed to wait for page redirect to {redirectUrl}", RedirectUrl);
+            logger.LogWarning(ex, "Failed to wait for page response: {authorizeUrl}", AuthorizeUrl);
         }
 
         return false;
@@ -292,18 +301,42 @@ public sealed class PlaywrightFetcherService(
 
     private async Task ChooseCurrentUserAsync(IPage page, string userMatch)
     {
-        await page.Locator(".houseNum").GetByRole(AriaRole.Textbox, new LocatorGetByRoleOptions { Name = "请选择" }).ClickAsync();
-        await page.Locator(".popper__arrow").WaitForAsync();
-
-        await page
-            .Locator("li.el-select-dropdown__item")
-            .Filter(new LocatorFilterOptions
-            {
-                HasText = userMatch,
-                Visible = true,
-            })
-            .ClickAsync();
         logger.LogInformation("Choosing user by match: {userMatch}", userMatch);
+        var chosen = false;
+        for (var i = 0; i < _maxAttempts; i++)
+        {
+            try
+            {
+                await page.Locator(".houseNum").GetByRole(AriaRole.Textbox, new LocatorGetByRoleOptions { Name = "请选择" }).ClickAsync();
+                await page.Locator(".popper__arrow").WaitForAsync();
+                await page
+                    .Locator("li.el-select-dropdown__item")
+                    .Filter(new LocatorFilterOptions
+                    {
+                        HasText = userMatch,
+                        Visible = true,
+                    })
+                    .ClickAsync();
+
+                chosen = true;
+                break;
+            }
+            catch (TimeoutException ex)
+            {
+                logger.LogWarning(ex, "Failed to open user selection dropdown, retrying: {attempt} / {maxAttempts}", i + 1, _maxAttempts);
+            }
+
+            await page.ReloadAsync();
+        }
+
+        if (!chosen)
+        {
+            // If we failed to select user after multiple attempts, log an error and throw.
+            logger.LogError("Failed to select user after multiple attempts by match: {userMatch}", userMatch);
+            throw new InvalidOperationException("Failed to select user after multiple attempts");
+        }
+
+        logger.LogInformation("Successfully opened user selection dropdown and selected user: {userMatch}", userMatch);
     }
 
     private async Task<decimal> GetElectricBalanceAsync(IPage page, CancellationToken cancellationToken)

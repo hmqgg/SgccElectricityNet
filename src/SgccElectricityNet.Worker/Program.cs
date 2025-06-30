@@ -14,11 +14,11 @@ builder.Logging.AddZLoggerConsole(o =>
     o.UsePlainTextFormatter(f =>
     {
         f.SetPrefixFormatter(
-            $"{0:utc-longdate} [{1:short}] ({2}) ",
+            $"{0} [{1:short}] ({2}) ",
             (in MessageTemplate template, in LogInfo info) => template.Format(
-                info.Timestamp,
+                info.Timestamp.Utc.ToOffset(TimeSpan.FromHours(+8)).ToString("s"),
                 info.LogLevel,
-                info.Category));
+                info.Category.Name.Split('.').LastOrDefault()));
     });
 });
 
