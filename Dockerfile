@@ -23,7 +23,7 @@ ENV PLAYWRIGHT_BROWSERS_PATH=/app/.playwright
 USER root
 RUN \
     ln -s /usr/share/powershell/pwsh /usr/bin/pwsh && \
-    pwsh /app/playwright.ps1 install --with-deps chromium && \
+    pwsh /app/playwright.ps1 install --with-deps chromium --only-shell && \
     rm -rf /usr/share/powershell /usr/bin/pwsh && \
     chmod -R +x /app/.playwright && \
     chown -R $APP_UID:$APP_UID /app/.playwright

@@ -511,18 +511,25 @@ public sealed class PlaywrightBrowserFactory : IAsyncDisposable
                 return await _playwright.Chromium.ConnectAsync(wsUrl);
             }
 
-            var exitCode = Microsoft.Playwright.Program.Main(["install", "chromium"]);
+            string[] installArgs = [ "install", "--with-deps", "chromium", "--only-shell" ];
+            if (hostEnvironment.IsDevelopment())
+            {
+                // In development mode we need headful browser for debugging.
+                installArgs = installArgs[..^1];
+            }
+            var exitCode = Microsoft.Playwright.Program.Main(installArgs);
             if (exitCode != 0)
             {
                 throw new InvalidOperationException($"Playwright installation failed with exit code {exitCode}");
             }
 
             _playwright = await Playwright.CreateAsync();
-            return await _playwright.Chromium.LaunchAsync(new BrowserTypeLaunchOptions
-            {
-                Headless = !hostEnvironment.IsDevelopment(),
-                Args = ["--disable-dev-shm-usage"],
-            });
+            return await _playwright.Chromium.LaunchAsync(
+                new BrowserTypeLaunchOptions
+                {
+                    Headless = !hostEnvironment.IsDevelopment(),
+                    Args = ["--disable-dev-shm-usage"],
+                });
         });
     }
 
