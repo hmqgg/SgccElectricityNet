@@ -511,7 +511,7 @@ public sealed class PlaywrightBrowserFactory : IAsyncDisposable
                 return await _playwright.Chromium.ConnectAsync(wsUrl);
             }
 
-            string[] installArgs = [ "install", "--with-deps", "chromium", "--only-shell" ];
+            string[] installArgs = [ "install", "chromium", "--only-shell" ];
             if (hostEnvironment.IsDevelopment())
             {
                 // In development mode we need headful browser for debugging.
