@@ -342,8 +342,8 @@ public sealed class PlaywrightFetcherService(
     private async Task<decimal> GetElectricBalanceAsync(IPage page, CancellationToken cancellationToken)
     {
         // Yes, it's 'acccount'.
-        var balanceText = await page.Locator(".acccount .amt .num").TextContentAsync();
-        var amountText = await page.Locator(".acccount .amt.light .amttxt").TextContentAsync();
+        var balanceText = await page.Locator(".acccount .amt .num").First.TextContentAsync();
+        var amountText = await page.Locator(".acccount .amt .amttxt").First.TextContentAsync();
         cancellationToken.ThrowIfCancellationRequested();
 
         if (string.IsNullOrWhiteSpace(balanceText))
@@ -353,7 +353,7 @@ public sealed class PlaywrightFetcherService(
         }
 
         var balance = decimal.Parse(balanceText);
-        var signedBalance = amountText?.Contains("已结清") ?? true ? balance : -balance;
+        var signedBalance = amountText?.Contains("欠费") ?? true ? -balance : +balance;
         logger.LogInformation("Found electric balance: {signedBalance}", signedBalance);
 
         return signedBalance;

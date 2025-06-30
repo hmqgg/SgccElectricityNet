@@ -18,7 +18,7 @@ public static class ServiceCollectionExtensions
             {
                 case PublishingServiceType.Mqtt:
                     services.AddSingleton(Options.Create(serviceSection.Get<MqttPublishingOptions>()!));
-                    services.AddSingleton<IPublishingService, MqttPublishingService>();
+                    services.AddScoped<IPublishingService, MqttPublishingService>();
                     break;
                 case PublishingServiceType.Database:
                     throw new NotImplementedException("Database publishing service is not implemented yet.");

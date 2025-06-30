@@ -25,6 +25,7 @@ public sealed class UpdateInvocable(
         catch (InvalidOperationException ioe)
         {
             logger.LogError(ioe, "Operation failed at: {time}", DateTimeOffset.Now);
+            throw;
         }
         catch (OperationCanceledException oce)
         {
