@@ -16,11 +16,11 @@ public static class ServiceCollectionExtensions
         {
             case CaptchaServiceType.Onnx:
                 services.AddSingleton(Options.Create(captchaSection.Get<OnnxCaptchaOptions>()!));
-                services.AddSingleton<ICaptchaService, OnnxCaptchaService>();
+                services.AddScoped<ICaptchaService, OnnxCaptchaService>();
                 break;
             case CaptchaServiceType.Recognizer:
                 services.AddSingleton(Options.Create(captchaSection.Get<RecognizerCaptchaOptions>()!));
-                services.AddSingleton<ICaptchaService, RecognizerCaptchaService>();
+                services.AddScoped<ICaptchaService, RecognizerCaptchaService>();
                 break;
             case CaptchaServiceType.SmsWebhook:
                 services.AddHttpClient();
