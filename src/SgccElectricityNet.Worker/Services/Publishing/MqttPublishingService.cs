@@ -62,7 +62,6 @@ public sealed class MqttPublishingService : IPublishingService
         var stateMessage = new MqttApplicationMessageBuilder()
             .WithTopic(stateTopic)
             .WithPayload(JsonSerializer.Serialize(statePayload))
-            .WithRetainFlag()
             .Build();
 
         await mqttClient.PublishAsync(stateMessage, cancellationToken);
