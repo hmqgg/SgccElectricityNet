@@ -354,7 +354,7 @@ public sealed class PlaywrightFetcherService(
 
         var balance = decimal.Parse(balanceText);
         var signedBalance = amountText?.Contains("欠费") ?? true ? -balance : +balance;
-        logger.LogInformation("Found electric balance: {signedBalance}", signedBalance);
+        logger.LogInformation("Found electric balance: {signedBalance}CNY", signedBalance);
 
         return signedBalance;
     }
@@ -391,7 +391,7 @@ public sealed class PlaywrightFetcherService(
             throw new InvalidOperationException("Failed to parse yearly usage or charge text.");
         }
 
-        logger.LogInformation("Found yearly usage: {Usage} - Yearly charge: {Charge}", yearlyUsageText, yearlyChargeText);
+        logger.LogInformation("Found yearly usage: {Usage}kWh - Yearly charge: {Charge}CNY", yearlyUsageText, yearlyChargeText);
         return (Usage: yearlyUsage, Charge: yearlyCharge);
     }
 
@@ -444,7 +444,7 @@ public sealed class PlaywrightFetcherService(
             }
 
             var month = date.ToString("yyyy-MM");
-            logger.LogInformation("Found monthly usage: {month}, {usage}, {charge}", month, usageText, chargeText);
+            logger.LogInformation("Found monthly usage: {month}, {usage}kWh, {charge}CNY", month, usageText, chargeText);
             records.Add(new MonthlyUsageRecord(month, usage, charge));
             cancellationToken.ThrowIfCancellationRequested();
         }
@@ -485,7 +485,7 @@ public sealed class PlaywrightFetcherService(
                 continue;
             }
 
-            logger.LogInformation("Found daily usage: {date}, {usage}", dateText, usageText);
+            logger.LogInformation("Found daily usage: {date}, {usage}kWh", dateText, usageText);
             records.Add(new DailyUsageRecord(date, usage));
             cancellationToken.ThrowIfCancellationRequested();
         }
