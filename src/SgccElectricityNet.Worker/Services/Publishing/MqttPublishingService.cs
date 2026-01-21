@@ -49,6 +49,8 @@ public sealed class MqttPublishingService : IPublishingService
         var discoveryMessage = new MqttApplicationMessageBuilder()
             .WithTopic(discoveryTopic)
             .WithPayload(discoveryPayload)
+            .WithQualityOfServiceLevel(MqttQualityOfServiceLevel.AtLeastOnce)
+            .WithRetainFlag(true)
             .Build();
 
         using var mqttClient = _mqttClientFactory.CreateMqttClient();
@@ -62,6 +64,8 @@ public sealed class MqttPublishingService : IPublishingService
         var stateMessage = new MqttApplicationMessageBuilder()
             .WithTopic(stateTopic)
             .WithPayload(JsonSerializer.Serialize(statePayload))
+            .WithQualityOfServiceLevel(MqttQualityOfServiceLevel.AtLeastOnce)
+            .WithRetainFlag(true)
             .Build();
 
         await mqttClient.PublishAsync(stateMessage, cancellationToken);
