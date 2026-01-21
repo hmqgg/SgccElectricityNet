@@ -15,9 +15,9 @@
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.22.1-Preview.1" />
     <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.22.0" />
     <PackageReference Include="Nito.AsyncEx.Coordination" Version="5.1.2" />
-    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.10" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
     <PackageReference Include="System.Numerics.Tensors" Version="9.0.6" />
-    <PackageReference Include="HomeAssistantDiscoveryNet" Version="5.1.0" />
+    <PackageReference Include="HomeAssistantDiscoveryNet" Version="5.1.1" />
     <PackageReference Include="MQTTnet" Version="5.0.1.1416" />
     <PackageReference Include="Tomlyn.Extensions.Configuration" Version="1.0.6" />
     <PackageReference Include="ZLogger" Version="2.5.10" />
