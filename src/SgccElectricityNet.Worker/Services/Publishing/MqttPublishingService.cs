@@ -3,6 +3,7 @@ using HomeAssistantDiscoveryNet;
 using Microsoft.Extensions.Options;
 using MQTTnet;
 using MQTTnet.Diagnostics.Logger;
+using MQTTnet.Protocol;
 using SgccElectricityNet.Worker.Models;
 
 namespace SgccElectricityNet.Worker.Services.Publishing;
@@ -50,7 +51,7 @@ public sealed class MqttPublishingService : IPublishingService
             .WithTopic(discoveryTopic)
             .WithPayload(discoveryPayload)
             .WithQualityOfServiceLevel(MqttQualityOfServiceLevel.AtLeastOnce)
-            .WithRetainFlag(true)
+            .WithRetainFlag()
             .Build();
 
         using var mqttClient = _mqttClientFactory.CreateMqttClient();
@@ -65,7 +66,7 @@ public sealed class MqttPublishingService : IPublishingService
             .WithTopic(stateTopic)
             .WithPayload(JsonSerializer.Serialize(statePayload))
             .WithQualityOfServiceLevel(MqttQualityOfServiceLevel.AtLeastOnce)
-            .WithRetainFlag(true)
+            .WithRetainFlag()
             .Build();
 
         await mqttClient.PublishAsync(stateMessage, cancellationToken);
