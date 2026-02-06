@@ -342,8 +342,8 @@ public sealed class PlaywrightFetcherService(
     private async Task<decimal> GetElectricBalanceAsync(IPage page, CancellationToken cancellationToken)
     {
         // Yes, it's 'acccount'.
-        var balanceText = await page.Locator(".acccount .amt .num").First.TextContentAsync();
-        var amountText = await page.Locator(".acccount .amt .amttxt").First.TextContentAsync();
+        var balanceText = await page.Locator(".acccount .num").First.TextContentAsync();
+        var amountText = "欠费";
         cancellationToken.ThrowIfCancellationRequested();
 
         if (string.IsNullOrWhiteSpace(balanceText))
